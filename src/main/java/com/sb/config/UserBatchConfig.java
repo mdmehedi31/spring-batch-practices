@@ -4,6 +4,7 @@ package com.sb.config;
 import com.sb.entity.UserEntity;
 import com.sb.respository.UserRepository;
 import org.apache.catalina.User;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.Job;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
@@ -16,6 +17,7 @@ import org.springframework.batch.infrastructure.item.file.builder.FlatFileItemRe
 import org.springframework.batch.infrastructure.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.infrastructure.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.infrastructure.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -32,7 +34,10 @@ public class UserBatchConfig {
 
 
     @Bean
-    public FlatFileItemReader<UserEntity> reader() {
+    @StepScope
+    public FlatFileItemReader<UserEntity> reader(@Value("#{jobParameters['campaignId']}") String campaignId) {
+
+        System.out.println("Config::  campaignId: " + campaignId);
         return new FlatFileItemReaderBuilder<UserEntity>()
                 .name("userItemReader1")
                 .resource(new ClassPathResource("people-1000.csv"))
@@ -83,9 +88,10 @@ public class UserBatchConfig {
     public Step step(JobRepository jobRepository) {
 
 
+
         return  new StepBuilder("csv-import-step1", jobRepository)
                 .<UserEntity, UserEntity>chunk(10)
-                .reader(reader())
+                .reader(reader(null))
                 .processor(processor())
                 .writer(writer())
                 .build();
