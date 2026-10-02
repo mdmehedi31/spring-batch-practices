@@ -4,11 +4,11 @@ package com.sb.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "tb_user")
+@Table(name = "users")
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+  //  @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String userId;
